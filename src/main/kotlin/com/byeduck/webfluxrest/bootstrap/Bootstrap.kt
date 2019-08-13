@@ -15,7 +15,7 @@ class Bootstrap(
 ) : CommandLineRunner {
 
     override fun run(vararg args: String?) {
-        print("############## LOADING DATA ON BOOTSTRAP ##############")
+        println("############## LOADING DATA ON BOOTSTRAP ##############")
         fillCategories()
         fillVendors()
     }
@@ -23,26 +23,37 @@ class Bootstrap(
     fun fillCategories() {
         if (categoryRepository.count().block()?.equals(0L) == true) {
 
-            categoryRepository.save(Category("Fruits"))
-            categoryRepository.save(Category("Nuts"))
-            categoryRepository.save(Category("Breads"))
-            categoryRepository.save(Category("Meats"))
-            categoryRepository.save(Category("Eggs"))
+            saveCategory("Fruits")
+            saveCategory("Nuts")
+            saveCategory("Breads")
+            saveCategory("Meats")
+            saveCategory("Eggs")
 
-            print("Loaded categories: ${categoryRepository.count().block()}")
+            println("Loaded categories: ${categoryRepository.count().block()}")
         }
     }
 
     fun fillVendors() {
         if (vendorRepository.count().block()?.equals(0L) == true) {
-            vendorRepository.save(Vendor("Joe", "Buck"))
-            vendorRepository.save(Vendor("Michael", "Weston"))
-            vendorRepository.save(Vendor("Jessie", "Waters"))
-            vendorRepository.save(Vendor("Bill", "Nershi"))
-            vendorRepository.save(Vendor("Jimmy", "Buffet"))
 
-            print("Loaded vendors: ${vendorRepository.count().block()}")
+            saveVendor("Joe", "Buck")
+            saveVendor("Michael", "Weston")
+            saveVendor("Jessie", "Waters")
+            saveVendor("Bill", "Nershi")
+            saveVendor("Jimmy", "Buffet")
+
+            println("Loaded vendors: ${vendorRepository.count().block()}")
         }
+    }
+
+    fun saveCategory(description: String) {
+        val saved = categoryRepository.save(Category(description)).block()
+        println("Saved category with id ${saved?.id}")
+    }
+
+    fun saveVendor(firstName: String, lastName: String) {
+        val saved = vendorRepository.save(Vendor(firstName, lastName)).block()
+        println("Saved vendor with id ${saved?.id}")
     }
 
 }
