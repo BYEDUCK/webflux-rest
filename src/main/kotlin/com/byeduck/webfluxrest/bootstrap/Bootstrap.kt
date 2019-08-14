@@ -30,6 +30,8 @@ class Bootstrap(
             saveCategory("Eggs")
 
             println("Loaded categories: ${categoryRepository.count().block()}")
+        } else {
+            println("Categories already added. Skipping...")
         }
     }
 
@@ -43,6 +45,8 @@ class Bootstrap(
             saveVendor("Jimmy", "Buffet")
 
             println("Loaded vendors: ${vendorRepository.count().block()}")
+        } else {
+            println("Vendors already added. Skipping...")
         }
     }
 
