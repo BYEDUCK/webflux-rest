@@ -3,6 +3,7 @@ package com.byeduck.webfluxrest.routers
 import com.byeduck.webfluxrest.domain.Vendor
 import com.byeduck.webfluxrest.handlers.VendorHandler
 import com.byeduck.webfluxrest.repositories.VendorRepository
+import com.byeduck.webfluxrest.validators.VendorValidator
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -23,7 +24,7 @@ class VendorRouterTest extends Specification {
 
     void setup() {
         def vendorRouter = new VendorRouter()
-        def routerFunction = vendorRouter.vendorRoutes(new VendorHandler(vendorRepository))
+        def routerFunction = vendorRouter.vendorRoutes(new VendorHandler(vendorRepository, new VendorValidator()))
         webTestClient = WebTestClient.bindToRouterFunction(routerFunction).build()
     }
 

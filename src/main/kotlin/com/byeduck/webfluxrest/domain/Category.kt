@@ -14,6 +14,11 @@ class Category() {
         this.description = description
     }
 
+    constructor(description: String, id: String) : this() {
+        this.description = description
+        this.id = id
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Category) return false

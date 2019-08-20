@@ -6,6 +6,6 @@ import reactor.core.publisher.Mono
 
 @Component
 class VendorValidator : Validator<Vendor> {
-    override fun validate(toBeValidated: Mono<Vendor>): Mono<Boolean> =
-            toBeValidated.filter { v -> v.firstName.isNotBlank() && v.lastName.isNotBlank() }.hasElement()
+    override fun validate(toBeValidated: Mono<Vendor>): Mono<Vendor> =
+            toBeValidated.filter { v -> v.lastName.isNotBlank() }
 }
