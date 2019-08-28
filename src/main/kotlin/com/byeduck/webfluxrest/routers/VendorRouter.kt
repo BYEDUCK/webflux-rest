@@ -1,5 +1,7 @@
 package com.byeduck.webfluxrest.routers
 
+import com.byeduck.webfluxrest.constants.baseVendorsUrl
+import com.byeduck.webfluxrest.constants.idPathParameterName
 import com.byeduck.webfluxrest.handlers.VendorHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -11,9 +13,9 @@ class VendorRouter {
 
     @Bean
     fun vendorRoutes(vendorHandler: VendorHandler) = router {
-        ("/api/v1/vendors" and accept(MediaType.APPLICATION_JSON)).nest {
+        (baseVendorsUrl and accept(MediaType.APPLICATION_JSON)).nest {
             GET("/", vendorHandler::getAll)
-            GET("/{id}", vendorHandler::getById)
+            GET("/{$idPathParameterName}", vendorHandler::getById)
             POST("/", vendorHandler::add)
         }
     }

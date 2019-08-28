@@ -1,5 +1,6 @@
 package com.byeduck.webfluxrest.handlers
 
+import com.byeduck.webfluxrest.constants.*
 import com.byeduck.webfluxrest.domain.Category
 import com.byeduck.webfluxrest.repositories.CategoryRepository
 import com.byeduck.webfluxrest.validators.Validator
@@ -19,41 +20,46 @@ class CategoryHandler(
         @Autowired private val categoryValidator: Validator<Category>
 ) {
 
-    fun get(request: ServerRequest): Mono<ServerResponse> = request.queryParam("desc")
+    fun get(request: ServerRequest): Mono<ServerResponse> = request.queryParam(descriptionQueryParameterName)
             .map {
                 categoryRepository.findByDescription(it)
                         .flatMap { c -> ok().body(c.toMono()) }
                         .switchIfEmpty(notFound().build())
-            }.orElse(ok().body(categoryRepository.findAll()))
+            }.orElse(Mono.defer { ok().body(categoryRepository.findAll()) })
 
     fun getById(request: ServerRequest): Mono<ServerResponse> = categoryRepository
-            .findById(request.pathVariable("id"))
+            .findById(request.pathVariable(idPathParameterName))
             .flatMap { ok().body(it.toMono()) }
-            .switchIfEmpty(notFound().build())
+            .switchIfEmpty(noContent().build())
 
-    fun getByDescription(request: ServerRequest): Mono<ServerResponse> = categoryRepository
-            .findByDescription(request.queryParam("desc")
-                    .filter { it != null }
-                    .orElse(""))
-            .flatMap { ok().body(it.toMono()) }
-            .switchIfEmpty(notFound().build())
+    fun add(request: ServerRequest): Mono<ServerResponse> = categoryValidator
+            .validate(request.bodyToMono(Category::class.java))
+            .flatMap { c ->
+                categoryRepository.findByDescription(c.description)
+                        .flatMap { badRequest().body(Mono.just(givenCategoryAlreadyExistsMsg)) }
+                        .switchIfEmpty(
+                                Mono.defer {
+                                    categoryRepository
+                                            .saveAll(c.toMono())
+                                            .flatMap {
+                                                created(URI.create("$baseCategoriesUrl/${it.id}")).body(it.toMono())
+                                            }.toMono()
+                                }
+                        )
+            }.switchIfEmpty(badRequest().body(Mono.just(blankCategoryDescriptionMsg)))
 
-    fun add(request: ServerRequest): Mono<ServerResponse> = categoryRepository
-            .saveAll(categoryValidator.validate(request.bodyToMono(Category::class.java)))
-            .flatMap { created(URI.create("categories/${it.id}")).body(it.toMono()) }
-            .switchIfEmpty(badRequest().body(Mono.just("Description cannot be blank."))).toMono()
-
-    fun updateById(request: ServerRequest): Mono<ServerResponse> = categoryRepository
-            .findById(request.pathVariable("id"))
-            .flatMap {
-                ok().body(
-                        categoryValidator
-                                .validate(request.bodyToMono(Category::class.java))
-                                .map { Mono.just(Category(it.description, request.pathVariable("id"))) }
-                                .flatMap { categoryRepository.saveAll(it).toMono() })
-            }.switchIfEmpty(notFound().build())
+    fun updateById(request: ServerRequest): Mono<ServerResponse> = categoryValidator
+            .validate(request.bodyToMono(Category::class.java))
+            .flatMap { c ->
+                categoryRepository.findById(request.pathVariable(idPathParameterName))
+                        .flatMap {
+                            ok().body(categoryRepository.saveAll(
+                                    Mono.just(Category(c.description, request.pathVariable(idPathParameterName)))
+                            ).toMono())
+                        }.switchIfEmpty(notFound().build())
+            }.switchIfEmpty(badRequest().body(Mono.just(blankCategoryDescriptionMsg)))
 
     fun deleteById(request: ServerRequest): Mono<ServerResponse> = categoryRepository
-            .deleteById(request.pathVariable("id"))
+            .deleteById(request.pathVariable(idPathParameterName))
             .flatMap { ok().build() }
 }

@@ -1,5 +1,8 @@
 package com.byeduck.webfluxrest.handlers
 
+import com.byeduck.webfluxrest.constants.baseVendorsUrl
+import com.byeduck.webfluxrest.constants.blankVendorLastNameMsg
+import com.byeduck.webfluxrest.constants.idPathParameterName
 import com.byeduck.webfluxrest.domain.Vendor
 import com.byeduck.webfluxrest.repositories.VendorRepository
 import com.byeduck.webfluxrest.validators.VendorValidator
@@ -22,11 +25,11 @@ class VendorHandler(
             .body(vendorRepository.findAll())
 
     fun getById(request: ServerRequest) = ok()
-            .body(vendorRepository.findById(request.pathVariable("id")))
+            .body(vendorRepository.findById(request.pathVariable(idPathParameterName)))
 
     fun add(request: ServerRequest) = vendorRepository
             .saveAll(vendorValidator.validate(request.bodyToMono(Vendor::class.java)))
-            .flatMap { created(URI.create("vendors/${it.id}")).body(it.toMono()) }
-            .switchIfEmpty(badRequest().body(Mono.just("Last name cannot be blank"))).toMono()
+            .flatMap { created(URI.create("$baseVendorsUrl/${it.id}")).body(it.toMono()) }
+            .switchIfEmpty(badRequest().body(Mono.just(blankVendorLastNameMsg))).toMono()
 
 }

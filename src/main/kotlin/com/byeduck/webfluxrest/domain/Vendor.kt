@@ -1,5 +1,6 @@
 package com.byeduck.webfluxrest.domain
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
@@ -8,7 +9,10 @@ class Vendor() {
     @Id
     var id: String? = null
 
+    @JsonProperty("first_name")
     var firstName: String = ""
+
+    @JsonProperty("last_name")
     var lastName: String = ""
 
     constructor(firstName: String, lastName: String) : this() {
