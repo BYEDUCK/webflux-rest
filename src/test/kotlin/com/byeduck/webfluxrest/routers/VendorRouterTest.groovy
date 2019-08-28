@@ -79,7 +79,7 @@ class VendorRouterTest extends Specification {
                 .body(BodyInserters.fromObject(vendor))
                 .exchange()
                 .expectStatus().isCreated()
-                .returnResult(Vendor)
-                .responseBody.blockFirst() == saved
+                .expectBody(Vendor)
+                .isEqualTo(saved)
     }
 }

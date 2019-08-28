@@ -113,7 +113,8 @@ class CategoryRouterTest extends Specification {
                 .body(BodyInserters.fromObject(category))
                 .exchange()
                 .expectStatus().isBadRequest()
-                .returnResult(String).responseBody.blockFirst() == StringConstantsKt.blankCategoryDescriptionMsg
+                .expectBody(String)
+                .isEqualTo(StringConstantsKt.blankCategoryDescriptionMsg)
     }
 
     def "Insert category (category with given description already exists)"() {
@@ -130,7 +131,8 @@ class CategoryRouterTest extends Specification {
                 .body(BodyInserters.fromObject(category))
                 .exchange()
                 .expectStatus().isBadRequest()
-                .returnResult(String).responseBody.blockFirst() == StringConstantsKt.givenCategoryAlreadyExistsMsg
+                .expectBody(String)
+                .isEqualTo(StringConstantsKt.givenCategoryAlreadyExistsMsg)
     }
 
     def "Update category (good)"() {
@@ -175,7 +177,8 @@ class CategoryRouterTest extends Specification {
                 .body(BodyInserters.fromObject(updateCategory))
                 .exchange()
                 .expectStatus().isBadRequest()
-                .returnResult(String).responseBody.blockFirst() == StringConstantsKt.givenCategoryAlreadyExistsMsg
+                .expectBody(String)
+                .isEqualTo(StringConstantsKt.givenCategoryAlreadyExistsMsg)
     }
 
     def "Update category (invalid)"() {
@@ -192,7 +195,8 @@ class CategoryRouterTest extends Specification {
                 .body(BodyInserters.fromObject(category))
                 .exchange()
                 .expectStatus().isBadRequest()
-                .returnResult(String).responseBody.blockFirst() == StringConstantsKt.blankCategoryDescriptionMsg
+                .expectBody(String)
+                .isEqualTo(StringConstantsKt.blankCategoryDescriptionMsg)
     }
 
     def "Update category (not found)"() {
