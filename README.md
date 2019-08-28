@@ -53,3 +53,19 @@ Demo app created for learning purposes. REST API providing basic operations on t
 - POST / add new vendor
     - 400 BAD REQUEST if last name is blank
     - 201 CREATED if created
+    
+## Docker
+
+In order to run the app in docker container, run:
+
+`docker-compose up`
+
+And when you want to rebuild images:
+
+`docker-compose up --build`
+
+App will be available on port 48080 on your localhost.
+
+But firstly make sure to build application itself:
+
+`./gradlew bootJar`
