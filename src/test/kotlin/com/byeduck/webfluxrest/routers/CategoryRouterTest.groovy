@@ -137,9 +137,11 @@ class CategoryRouterTest extends Specification {
         given:
         def id = "testId"
         def desc = "testDesc"
+        def updateDesc = "newDesc"
         def category = new Category(desc, id)
-        def updateCategory = new Category("newDesc")
+        def updateCategory = new Category(updateDesc)
         categoryRepository.findById(id) >> { return Mono.just(category) }
+        categoryRepository.findByDescription(updateDesc) >> { return Mono.empty() }
         categoryRepository.saveAll(_ as Mono) >> { return Flux.just(new Category(updateCategory.description, id)) }
 
         expect:
@@ -153,6 +155,27 @@ class CategoryRouterTest extends Specification {
                 .expectStatus().isOk()
                 .expectBody(Category)
                 .isEqualTo(new Category(updateCategory.description, id))
+    }
+
+    def "Update category with description that already exists"() {
+        given:
+        def id = "testId"
+        def desc = "testDesc"
+        def updateDesc = "newDesc"
+        def category = new Category(desc, id)
+        def updateCategory = new Category(updateDesc)
+        categoryRepository.findById(id) >> { return Mono.just(category) }
+        categoryRepository.findByDescription(updateDesc) >> { return Mono.just(new Category(updateDesc, "123")) }
+
+        expect:
+        webTestClient
+                .method(HttpMethod.PUT)
+                .uri("${baseUrl}/${id}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromObject(updateCategory))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .returnResult(String).responseBody.blockFirst() == StringConstantsKt.givenCategoryAlreadyExistsMsg
     }
 
     def "Update category (invalid)"() {
@@ -217,5 +240,14 @@ class CategoryRouterTest extends Specification {
                 .uri("${baseUrl}?${StringConstantsKt.descriptionQueryParameterName}=${desc}")
                 .exchange()
                 .expectStatus().isNotFound()
+    }
+
+    def "Get category by description (blank description)"() {
+        expect:
+        webTestClient
+                .method(HttpMethod.GET)
+                .uri("${baseUrl}?${StringConstantsKt.descriptionQueryParameterName}=")
+                .exchange()
+                .expectStatus().isNoContent()
     }
 }

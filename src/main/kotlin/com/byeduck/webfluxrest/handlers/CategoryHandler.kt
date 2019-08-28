@@ -13,6 +13,7 @@ import org.springframework.web.reactive.function.server.body
 import reactor.core.publisher.Mono
 import reactor.core.publisher.toMono
 import java.net.URI
+import java.util.*
 
 @Component
 class CategoryHandler(
@@ -21,10 +22,12 @@ class CategoryHandler(
 ) {
 
     fun get(request: ServerRequest): Mono<ServerResponse> = request.queryParam(descriptionQueryParameterName)
-            .map {
-                categoryRepository.findByDescription(it)
-                        .flatMap { c -> ok().body(c.toMono()) }
-                        .switchIfEmpty(notFound().build())
+            .map { desc ->
+                Optional.of(desc).filter { it.isNotBlank() }.map {
+                    categoryRepository.findByDescription(desc)
+                            .flatMap { c -> ok().body(c.toMono()) }
+                            .switchIfEmpty(notFound().build())
+                }.orElse(noContent().build())
             }.orElse(Mono.defer { ok().body(categoryRepository.findAll()) })
 
     fun getById(request: ServerRequest): Mono<ServerResponse> = categoryRepository
@@ -53,9 +56,13 @@ class CategoryHandler(
             .flatMap { c ->
                 categoryRepository.findById(request.pathVariable(idPathParameterName))
                         .flatMap {
-                            ok().body(categoryRepository.saveAll(
-                                    Mono.just(Category(c.description, request.pathVariable(idPathParameterName)))
-                            ).toMono())
+                            categoryRepository.findByDescription(c.description)
+                                    .flatMap { badRequest().body(Mono.just(givenCategoryAlreadyExistsMsg)) }
+                                    .switchIfEmpty(Mono.defer {
+                                        ok().body(categoryRepository.saveAll(
+                                                Mono.just(Category(c.description, request.pathVariable(idPathParameterName)))
+                                        ).toMono())
+                                    })
                         }.switchIfEmpty(notFound().build())
             }.switchIfEmpty(badRequest().body(Mono.just(blankCategoryDescriptionMsg)))
 
