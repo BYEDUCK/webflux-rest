@@ -5,6 +5,7 @@ import com.byeduck.webfluxrest.domain.Vendor
 import com.byeduck.webfluxrest.handlers.VendorHandler
 import com.byeduck.webfluxrest.repositories.VendorRepository
 import com.byeduck.webfluxrest.validators.VendorValidator
+import org.reactivestreams.Publisher
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -73,6 +74,9 @@ class VendorRouterTest extends Specification {
                 .uri("${baseUrl}?${StringConstantsKt.lastNameQueryParameterName}=${invalidLastName}")
                 .exchange()
                 .expectStatus().isNoContent()
+
+        cleanup:
+        0 * vendorRepository.findByLastName(_ as String)
     }
 
     def "Get vendor by id (match) test"() {
@@ -142,5 +146,73 @@ class VendorRouterTest extends Specification {
                 .expectStatus().isBadRequest()
                 .expectBody(String)
                 .isEqualTo(StringConstantsKt.blankVendorLastNameMsg)
+
+        cleanup:
+        0 * vendorRepository.saveAll(_ as Publisher)
+    }
+
+    def "Update vendor by id (good)"() {
+        given:
+        def id = "123"
+        def vendor = new Vendor("a", "b")
+        def savedVendor = new Vendor("c", "d")
+        savedVendor.id = id
+        def updatedVendor = new Vendor(vendor.firstName, vendor.lastName)
+        updatedVendor.id = id
+        vendorRepository.findById(id) >> { return Mono.just(savedVendor) }
+        vendorRepository.saveAll(_ as Mono) >> { return Flux.just(updatedVendor) }
+
+        expect:
+        webTestClient
+                .method(HttpMethod.PUT)
+                .uri("${baseUrl}/${id}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromObject(vendor))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Vendor)
+                .isEqualTo(updatedVendor)
+
+    }
+
+    def "Update vendor by id (not found)"() {
+        given:
+        def id = "123"
+        def vendor = new Vendor("a", "b")
+        vendorRepository.findById(id) >> { return Mono.empty() }
+
+        expect:
+        webTestClient
+                .method(HttpMethod.PUT)
+                .uri("${baseUrl}/${id}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromObject(vendor))
+                .exchange()
+                .expectStatus().isNotFound()
+
+        cleanup:
+        0 * vendorRepository.saveAll(_ as Publisher)
+    }
+
+    def "Update vendor by id (invalid vendor)"() {
+        given:
+        def id = "123"
+        def vendor = new Vendor()
+        vendor.firstName = "a"
+
+        expect:
+        webTestClient
+                .method(HttpMethod.PUT)
+                .uri("${baseUrl}/${id}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromObject(vendor))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(String)
+                .isEqualTo(StringConstantsKt.blankVendorLastNameMsg)
+
+        cleanup:
+        0 * vendorRepository.findById(_ as String)
     }
 }

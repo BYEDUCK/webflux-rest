@@ -5,6 +5,7 @@ import com.byeduck.webfluxrest.domain.Category
 import com.byeduck.webfluxrest.handlers.CategoryHandler
 import com.byeduck.webfluxrest.repositories.CategoryRepository
 import com.byeduck.webfluxrest.validators.CategoryValidator
+import org.reactivestreams.Publisher
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
@@ -115,6 +116,10 @@ class CategoryRouterTest extends Specification {
                 .expectStatus().isBadRequest()
                 .expectBody(String)
                 .isEqualTo(StringConstantsKt.blankCategoryDescriptionMsg)
+
+        cleanup:
+        0 * categoryRepository.findByDescription(_ as String)
+        0 * categoryRepository.saveAll(_ as Publisher)
     }
 
     def "Insert category (category with given description already exists)"() {
@@ -133,6 +138,9 @@ class CategoryRouterTest extends Specification {
                 .expectStatus().isBadRequest()
                 .expectBody(String)
                 .isEqualTo(StringConstantsKt.givenCategoryAlreadyExistsMsg)
+
+        cleanup:
+        0 * categoryRepository.saveAll(_ as Publisher)
     }
 
     def "Update category (good)"() {
@@ -179,6 +187,9 @@ class CategoryRouterTest extends Specification {
                 .expectStatus().isBadRequest()
                 .expectBody(String)
                 .isEqualTo(StringConstantsKt.givenCategoryAlreadyExistsMsg)
+
+        cleanup:
+        0 * categoryRepository.saveAll(_ as Publisher)
     }
 
     def "Update category (invalid)"() {
@@ -197,6 +208,11 @@ class CategoryRouterTest extends Specification {
                 .expectStatus().isBadRequest()
                 .expectBody(String)
                 .isEqualTo(StringConstantsKt.blankCategoryDescriptionMsg)
+
+        cleanup:
+        0 * categoryRepository.findById(_ as String)
+        0 * categoryRepository.findByDescription(_ as String)
+        0 * categoryRepository.saveAll(_ as Publisher)
     }
 
     def "Update category (not found)"() {
@@ -213,6 +229,10 @@ class CategoryRouterTest extends Specification {
                 .body(BodyInserters.fromObject(category))
                 .exchange()
                 .expectStatus().isNotFound()
+
+        cleanup:
+        0 * categoryRepository.findByDescription(_ as String)
+        0 * categoryRepository.saveAll(_ as Publisher)
     }
 
     def "Get category by description (good)"() {
@@ -253,5 +273,8 @@ class CategoryRouterTest extends Specification {
                 .uri("${baseUrl}?${StringConstantsKt.descriptionQueryParameterName}=")
                 .exchange()
                 .expectStatus().isNoContent()
+
+        cleanup:
+        0 * categoryRepository.findByDescription(_ as String)
     }
 }

@@ -38,5 +38,9 @@ class Vendor() {
         return result
     }
 
+    override fun toString(): String {
+        return "Vendor(id=$id, firstName='$firstName', lastName='$lastName')"
+    }
+
 
 }

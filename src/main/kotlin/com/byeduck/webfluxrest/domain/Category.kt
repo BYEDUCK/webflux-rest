@@ -35,5 +35,9 @@ class Category() {
         return result
     }
 
+    override fun toString(): String {
+        return "Category(id=$id, description='$description')"
+    }
+
 
 }

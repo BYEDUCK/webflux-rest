@@ -17,6 +17,7 @@ class VendorRouter {
             GET("/", vendorHandler::getAll)
             GET("/{$idPathParameterName}", vendorHandler::getById)
             POST("/", vendorHandler::add)
+            PUT("/{$idPathParameterName}", vendorHandler::updateById)
         }
     }
 
