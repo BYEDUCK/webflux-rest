@@ -1,0 +1,32 @@
+version: 2
+jobs:
+  build:
+    environment:
+      # Configure the JVM and Gradle to avoid OOM errors
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
+    docker:
+      - image: circleci/openjdk:8-jdk-stretch
+    steps:
+      - checkout
+      - run:
+          name: Run tests
+          # Use "./gradlew test" instead if tests are not run in parallel
+          command:
+            ./gradlew test
+      - store_test_results:
+          path: build/test-results/test
+      - store_artifacts:
+          path: build/test-results/test
+          when: always
+      - run:
+          name: Assemble JAR
+          command:
+            ./gradlew assemble
+      # This will be empty for all nodes except the first one
+      - store_artifacts:
+          path: build/libs
+workflows:
+  version: 2
+  workflow:
+    jobs:
+    - build
