@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    compile("com.github.mowedgrass:jasypt-gradle-boot-plugin:0.1.33")
+    compile("com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.1")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
