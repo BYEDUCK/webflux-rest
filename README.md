@@ -72,4 +72,4 @@ But firstly make sure to build application itself:
 
 ## Build status
 
-[![CircleCI](https://circleci.com/gh/BYEDUCK/webflux-rest/tree/circleci.svg?style=svg)](https://circleci.com/gh/BYEDUCK/webflux-rest/tree/circleci)
+[![CircleCI](https://circleci.com/gh/BYEDUCK/webflux-rest/tree/master.svg?style=svg)](https://circleci.com/gh/BYEDUCK/webflux-rest/tree/master)
