@@ -1,6 +1,7 @@
 package com.byeduck.webfluxrest.routers
 
 import com.byeduck.webfluxrest.constants.StringConstantsKt
+import com.byeduck.webfluxrest.domain.Category
 import com.byeduck.webfluxrest.handlers.CategoryHandler
 import com.byeduck.webfluxrest.repositories.CategoryRepository
 import com.byeduck.webfluxrest.validators.CategoryValidator

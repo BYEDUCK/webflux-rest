@@ -1,5 +1,6 @@
 package com.byeduck.webfluxrest.repositories
 
+import com.byeduck.webfluxrest.domain.Category
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
 import spock.lang.Specification

@@ -18,7 +18,7 @@ jobs:
           command: |
             cd src/test/kotlin
             # Get list of classnames of tests that should run on this node
-            CLASSNAMES=$(circleci tests glob "**/*.groovy")
+            CLASSNAMES=$(circleci tests glob "**/*.groovy" "**/*.kt")
             cd ../../..
             # Format the arguments to "./gradlew test"
             GRADLE_ARGS=$(echo $CLASSNAMES | awk '{for (i=1; i<=NF; i++) print "--tests",$i}')
