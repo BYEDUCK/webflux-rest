@@ -1,5 +1,6 @@
 package com.byeduck.webfluxrest.routers
 
+import com.byeduck.webfluxrest.constants.StringConstantsKt
 import com.byeduck.webfluxrest.domain.Vendor
 import com.byeduck.webfluxrest.handlers.VendorHandler
 import com.byeduck.webfluxrest.repositories.VendorRepository
@@ -44,7 +45,37 @@ class VendorRouterTest extends Specification {
                 .isEqualTo(vendorList)
     }
 
-    def "Get vendor by id test"() {
+    def "Get vendors by last name (valid)"() {
+        given:
+        def commonLastName = "b"
+        def vendorMatch1 = new Vendor("a", commonLastName)
+        def vendorMatch2 = new Vendor("c", commonLastName)
+        vendorRepository.findByLastName(commonLastName) >> { return Flux.just(vendorMatch1, vendorMatch2) }
+
+        expect:
+        webTestClient
+                .method(HttpMethod.GET)
+                .uri("${baseUrl}?${StringConstantsKt.lastNameQueryParameterName}=${commonLastName}")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(Vendor)
+                .isEqualTo([vendorMatch1, vendorMatch2])
+    }
+
+    def "Get vendors by last name (invalid - blank last name)"() {
+        given:
+        def invalidLastName = ""
+
+        expect:
+        webTestClient
+                .method(HttpMethod.GET)
+                .uri("${baseUrl}?${StringConstantsKt.lastNameQueryParameterName}=${invalidLastName}")
+                .exchange()
+                .expectStatus().isNoContent()
+    }
+
+    def "Get vendor by id (match) test"() {
         given: "vendor with id"
         def vendor = new Vendor("a", "b")
         vendor.id = "123"
@@ -53,7 +84,7 @@ class VendorRouterTest extends Specification {
         expect:
         webTestClient
                 .method(HttpMethod.GET)
-                .uri("${baseUrl}/{id}", vendor.id)
+                .uri("${baseUrl}/${vendor.id}")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isOk()
@@ -61,7 +92,20 @@ class VendorRouterTest extends Specification {
                 .isEqualTo(vendor)
     }
 
-    def "Add vendor test"() {
+    def "Get vendor by id (no match)"() {
+        given:
+        def vendorId = "123"
+        vendorRepository.findById(vendorId) >> { return Mono.empty() }
+
+        expect:
+        webTestClient
+                .method(HttpMethod.GET)
+                .uri("${baseUrl}/${vendorId}")
+                .exchange()
+                .expectStatus().isNoContent()
+    }
+
+    def "Add vendor (good) test"() {
         given: "vendor without id ready to be saved"
         def vendor = new Vendor("a", "b")
         def saved = new Vendor(vendor.firstName, vendor.lastName)
@@ -81,5 +125,22 @@ class VendorRouterTest extends Specification {
                 .expectStatus().isCreated()
                 .expectBody(Vendor)
                 .isEqualTo(saved)
+    }
+
+    def "Add vendor (invalid - with blank last name)"() {
+        given:
+        def vendor = new Vendor()
+        vendor.firstName = "a"
+
+        expect:
+        webTestClient
+                .method(HttpMethod.POST)
+                .uri(baseUrl)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromObject(vendor))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(String)
+                .isEqualTo(StringConstantsKt.blankVendorLastNameMsg)
     }
 }

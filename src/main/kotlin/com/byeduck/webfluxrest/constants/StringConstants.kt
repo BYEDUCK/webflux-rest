@@ -10,6 +10,8 @@ const val idPathParameterName = "id"
 
 const val descriptionQueryParameterName = "desc"
 
+const val lastNameQueryParameterName = "lastName"
+
 const val baseCategoriesUrl = "/api/v1/categories"
 
 const val baseVendorsUrl = "/api/v1/vendors"
