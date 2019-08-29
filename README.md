@@ -69,3 +69,7 @@ App will be available on port 48080 on your localhost.
 But firstly make sure to build application itself:
 
 `./gradlew bootJar`
+
+## Build status
+
+[![CircleCI](https://circleci.com/gh/BYEDUCK/webflux-rest/tree/circleci.svg?style=svg)](https://circleci.com/gh/BYEDUCK/webflux-rest/tree/circleci)
