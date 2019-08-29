@@ -44,15 +44,25 @@ Demo app created for learning purposes. REST API providing basic operations on t
 - DELETE /{id} delete category with given id
     - 200 OK
 
-/api/v1/vendors (little behind):
+/api/v1/vendors:
 
 - GET / get all vendors
     - 200 OK
+- GET with query param "lastName" find vendor by last name
+    - 204 NO CONTENT if last name is blank
+    - 200 OK otherwise
 - GET /{id} find vendor by id
     - 200 OK
+    - 204 NO CONTENT if not found
 - POST / add new vendor
     - 400 BAD REQUEST if last name is blank
     - 201 CREATED if created
+- PUT /{id} update vendor by id
+    - 400 BAD REQUEST if last name is blank
+    - 404 NOT FOUND if vendor with given id not found
+    - 200 OK if updated
+- DELETE /{id} delete vendor by id
+    - 200 OK
     
 ## Docker
 
