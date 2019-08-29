@@ -50,4 +50,7 @@ class VendorHandler(
                         .switchIfEmpty(notFound().build())
             }.switchIfEmpty(badRequest().body(Mono.just(blankVendorLastNameMsg)))
 
+    fun deleteById(request: ServerRequest): Mono<ServerResponse> = ok()
+            .body(vendorRepository.deleteById(request.pathVariable(idPathParameterName)))
+
 }
