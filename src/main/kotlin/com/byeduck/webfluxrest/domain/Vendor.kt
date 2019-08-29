@@ -20,6 +20,12 @@ class Vendor() {
         this.lastName = lastName
     }
 
+    constructor(id: String, firstName: String, lastName: String) : this() {
+        this.id = id
+        this.firstName = firstName
+        this.lastName = lastName
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Vendor) return false

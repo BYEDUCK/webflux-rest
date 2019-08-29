@@ -44,9 +44,20 @@ class VendorHandler(
 
     fun updateById(request: ServerRequest): Mono<ServerResponse> = vendorValidator
             .validate(request.bodyToMono(Vendor::class.java))
-            .flatMap {
+            .flatMap { v ->
                 vendorRepository.findById(request.pathVariable(idPathParameterName))
-                        .flatMap { Mono.defer { ok().body(vendorRepository.saveAll(it.toMono()).toMono()) } }
+                        .flatMap {
+                            Mono.defer {
+                                ok().body(
+                                        vendorRepository
+                                                .saveAll(Mono.just(Vendor(
+                                                        request.pathVariable(idPathParameterName),
+                                                        v.firstName,
+                                                        v.lastName
+                                                ))).toMono()
+                                )
+                            }
+                        }
                         .switchIfEmpty(notFound().build())
             }.switchIfEmpty(badRequest().body(Mono.just(blankVendorLastNameMsg)))
 

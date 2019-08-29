@@ -81,8 +81,7 @@ class VendorRouterTest extends Specification {
 
     def "Get vendor by id (match) test"() {
         given: "vendor with id"
-        def vendor = new Vendor("a", "b")
-        vendor.id = "123"
+        def vendor = new Vendor("123", "a", "b")
         vendorRepository.findById(vendor.id) >> { return Mono.just(vendor) }
 
         expect:
@@ -155,10 +154,8 @@ class VendorRouterTest extends Specification {
         given:
         def id = "123"
         def vendor = new Vendor("a", "b")
-        def savedVendor = new Vendor("c", "d")
-        savedVendor.id = id
-        def updatedVendor = new Vendor(vendor.firstName, vendor.lastName)
-        updatedVendor.id = id
+        def savedVendor = new Vendor(id, "c", "d")
+        def updatedVendor = new Vendor(id, vendor.firstName, vendor.lastName)
         vendorRepository.findById(id) >> { return Mono.just(savedVendor) }
         vendorRepository.saveAll(_ as Mono) >> { return Flux.just(updatedVendor) }
 
