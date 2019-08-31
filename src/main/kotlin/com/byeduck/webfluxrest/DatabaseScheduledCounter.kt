@@ -5,6 +5,7 @@ import com.byeduck.webfluxrest.repositories.VendorRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Async
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.Scheduled
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component
 
 @EnableAsync
 @Component
+@Profile("heroku")
 class DatabaseScheduledCounter(
         @Autowired private val categoryRepository: CategoryRepository,
         @Autowired private val vendorRepository: VendorRepository
