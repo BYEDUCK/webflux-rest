@@ -20,11 +20,11 @@ class DatabaseScheduledCounter(
     private val logger: Logger = LoggerFactory.getLogger(DatabaseScheduledCounter::class.java)
 
     @Async
-    @Scheduled(fixedDelay = 20000, initialDelay = 15000)
+    @Scheduled(fixedDelay = 60000, initialDelay = 15000)
     fun countCategories() = logger.info("Categories count: {}", categoryRepository.count().block())
 
     @Async
-    @Scheduled(fixedDelay = 20000, initialDelay = 5000)
+    @Scheduled(fixedDelay = 60000, initialDelay = 5000)
     fun countVendors() = logger.info("Vendors count: {}", vendorRepository.count().block())
 
 }
