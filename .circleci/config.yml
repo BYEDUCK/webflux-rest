@@ -10,7 +10,6 @@ jobs:
       - checkout
       - run:
           name: Run tests
-          # Use "./gradlew test" instead if tests are not run in parallel
           command:
             ./gradlew test
       - store_test_results:
@@ -22,7 +21,6 @@ jobs:
           name: Assemble JAR
           command:
             ./gradlew assemble
-      # This will be empty for all nodes except the first one
       - store_artifacts:
           path: build/libs
       - run:

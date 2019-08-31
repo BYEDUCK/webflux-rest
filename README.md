@@ -83,3 +83,8 @@ But firstly make sure to build application itself:
 ## Build status
 
 [![CircleCI](https://circleci.com/gh/BYEDUCK/webflux-rest/tree/master.svg?style=svg)](https://circleci.com/gh/BYEDUCK/webflux-rest/tree/master)
+
+## Heroku
+
+API deployed on heroku.com and available under:
+https://webflux-rest.herokuapp.com
